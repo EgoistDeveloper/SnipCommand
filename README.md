@@ -15,10 +15,6 @@
   <img src="./docs/assets/images/screenshot-light.png">
 </p>
 
-<p align="center">
-  <img src="./docs/assets/images/screenshot-dark.png">
-</p>
-
 ## Overview
 
 It helps you create, organize and store your commands (Excel formulas, Sql Queries, Terminal commands, etc.) with dynamic parameters for quick copy to it. Describe your commands with dynamic parameters also support documentation about your snippets. You can select or specify your dynamic values using with selectbox/inputbox for ready to paste the workspace. You can organize with tags.
