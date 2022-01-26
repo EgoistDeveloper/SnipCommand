@@ -12,25 +12,21 @@
 </p>
 
 <p align="center">
-  <img src="./documentation/images/preview.png?v=2">
+  <img src="./docs/assets/images/screenshot-light.png">
 </p>
 
 <p align="center">
-    <strong>Built with Electron & React</strong> <br>
-    Built for Windows, macOS and Linux
+  <img src="./docs/assets/images/screenshot-dark.png">
 </p>
-
 
 ## Overview
-<p align="center">
-  <img src="./documentation/images/preview.gif?v=2">
-</p>
 
 It helps you create, organize and store your commands (Excel formulas, Sql Queries, Terminal commands, etc.) with dynamic parameters for quick copy to it. Describe your commands with dynamic parameters also support documentation about your snippets. You can select or specify your dynamic values using with selectbox/inputbox for ready to paste the workspace. You can organize with tags.
 
 
 ## 📢 Key Features
 
+- Cross-platform
 - Organize all commands with **tags** & **favourites** feature.
 - Describe dynamic parameters. Supporting input & selectbox for choosing parameter value.
 - Describe documentation text for each commands with Markdown Editor.
@@ -44,13 +40,13 @@ It helps you create, organize and store your commands (Excel formulas, Sql Queri
 
 ```
 # install dependencies
-yarn install
+npm i
 
-# serve with hot reload
-yarn electron-dev
+# serve app with electron
+npm run electron
 
 # build electron application for production
-yarn release
+npm release
 ```
 
 ## Releases
@@ -60,10 +56,6 @@ Download latest release builds at [releases](https://github.com/EgoistDeveloper/
 ## Documentation
 
 Visit the [this link](https://github.com/EgoistDeveloper/SnipCommand/blob/master/documentation/DOCUMENTATION.md)
-
-## Change Logs
-
-You can check logs from [this link](https://github.com/EgoistDeveloper/SnipCommand/blob/master/documentation/CHANGELOGS.md)
 
 ## About project continuation
 
