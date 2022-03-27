@@ -162,12 +162,12 @@ const StorageHelpers = {
         const backupsDir = storagePrefences.get('backupPath').toString();
 
         if (!fs.existsSync(appDir)) {
-            fs.mkdirSync(appDir);
+            fs.mkdirSync(appDir, { recursive: true });
             fs.appendFileSync(path.join(appDir, App.dbName), "");
         }
 
         if (!fs.existsSync(backupsDir)) {
-            fs.mkdirSync(backupsDir);
+            fs.mkdirSync(backupsDir, { recursive: true });
         }
     },
 

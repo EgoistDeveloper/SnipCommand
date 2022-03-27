@@ -22,6 +22,7 @@ class App extends Component {
         super(props);
 
         this.setTheme();
+        
         StorageHelpers.initDb();
         StorageHelpers.autoBackup();
 
