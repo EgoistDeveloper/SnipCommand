@@ -22,10 +22,10 @@
                 background: $activeBackgroundColor;
                 color: $activeBackgroundTextColor;
                 transition: 0.2s all ease-in;
-                opacity: 90%;
+                opacity: 90;
 
                 &:hover {
-                    opacity: 100%;
+                    opacity: 100;
                 }
             }
         }
