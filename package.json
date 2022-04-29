@@ -1,6 +1,6 @@
 {
   "name": "snipcommand",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "A free and open source command snippets manager for organize and copy fast.",
   "private": true,
   "main": "public/electron.js",
@@ -13,6 +13,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "electron-is-dev": "^1.2.0",
+    "electron-json-config": "^2.0.0",
     "electron-store": "^6.0.0",
     "generate-password": "^1.5.1",
     "lodash": "^4.17.19",
