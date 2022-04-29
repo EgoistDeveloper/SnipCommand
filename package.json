@@ -85,18 +85,18 @@
     "url": "https://github.com/gurayyarar/SnipCommand/issues"
   },
   "author": {
-    "name": "Güray Yarar (gurayyarar)",
-    "url": "https://github.com/gurayyarar",
-    "email": "guray.yarar@gmail.com"
+    "name": "EgoistDeveloper",
+    "url": "https://github.com/EgoistDeveloper",
+    "email": "epsilonelittr@gmail.com"
   },
   "links": {
-    "project-page": "https://github.com/gurayyarar/SnipCommand",
-    "author-page": "https://github.com/gurayyarar",
-    "license": "https://github.com/gurayyarar/SnipCommand/blob/master/LICENSE",
-    "changelogs": "https://github.com/gurayyarar/SnipCommand/blob/master/documentation/CHANGELOGS.md",
-    "documentation": "https://github.com/gurayyarar/SnipCommand/blob/master/documentation/DOCUMENTATION.md",
-    "issues": "https://github.com/gurayyarar/SnipCommand/issues",
-    "releases": "https://github.com/gurayyarar/SnipCommand/releases"
+    "project-page": "https://github.com/EgoistDeveloper/SnipCommand",
+    "author-page": "https://github.com/EgoistDeveloper",
+    "license": "https://github.com/EgoistDeveloper/SnipCommand/blob/master/LICENSE",
+    "changelogs": "https://github.com/EgoistDeveloper/SnipCommand/blob/master/documentation/CHANGELOGS.md",
+    "documentation": "https://github.com/EgoistDeveloper/SnipCommand/blob/master/documentation/DOCUMENTATION.md",
+    "issues": "https://github.com/EgoistDeveloper/SnipCommand/issues",
+    "releases": "https://github.com/EgoistDeveloper/SnipCommand/releases"
   },
   "build": {
     "productName": "SnipCommand",
