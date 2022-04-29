@@ -1,275 +1,310 @@
-import { remote } from 'electron';
+import { remote } from "electron";
 
-import _ from 'lodash';
-import shortid from 'shortid';
+import _ from "lodash";
+import shortid from "shortid";
 import Noty from "noty";
-import {platform, homedir} from 'os';
-import Store from 'electron-store';
-import moment from 'moment';
+import { platform, homedir } from "os";
+import Store from "electron-store";
+import moment from "moment";
 
 import Api from "./Api";
-import {SET_SELECTED_MENU_ITEM, SET_TAGS} from "../redux/actions/sidebarActions";
-import {SET_COMMAND_LIST} from "../redux/actions/commandActions";
+import {
+  SET_SELECTED_MENU_ITEM,
+  SET_TAGS,
+} from "../redux/actions/sidebarActions";
+import { SET_COMMAND_LIST } from "../redux/actions/commandActions";
 
 import "noty/src/noty.scss";
 import "noty/src/themes/sunset.scss";
-import {App} from "./Constants";
+import { App } from "./Constants";
 import fs from "fs";
 import path from "path";
 
-const isWin = platform() === 'win32';
-const defaultPath = isWin ? `${homedir()}\\${App.folderName}` : `${homedir()}/${App.folderName}`;
-const backupPath = isWin ? `${defaultPath}\\${App.backupFolderName}` : `${defaultPath}/${App.backupFolderName}`;
+const isWin = platform() === "win32";
+const defaultPath = isWin
+  ? `${homedir()}\\${App.folderName}`
+  : `${homedir()}/${App.folderName}`;
+const backupPath = isWin
+  ? `${defaultPath}\\${App.backupFolderName}`
+  : `${defaultPath}/${App.backupFolderName}`;
 const storagePrefences = new Store({
-    name: 'preferences',
-    schema: {
-        storagePath: {
-            default: defaultPath
-        },
-        backupPath: {
-            default: backupPath
-        }
-    }
-})
-
+  name: "preferences",
+  schema: {
+    storagePath: {
+      default: defaultPath,
+    },
+    backupPath: {
+      default: backupPath,
+    },
+  },
+});
 
 const CommandHelpers = {
-    organizeCommands: text => {
-        const result = [];
-        const matchedItems = text.match(new RegExp(`\\[s\\s*(.*?)\\s*\\/]`, 'g'));
+  organizeCommands: (text) => {
+    const result = [];
+    const matchedItems = text.match(new RegExp(`\\[s\\s*(.*?)\\s*\\/]`, "g"));
 
-        _.forEach(matchedItems, (val) => {
-            let type = 'variable';
+    _.forEach(matchedItems, (val) => {
+      let type = "variable";
 
-            if (val.indexOf('sc_choice') > -1) {
-                type = 'choice';
-            } else if (val.indexOf('sc_password') > -1) {
-                type = 'password';
-            }
+      if (val.indexOf("sc_choice") > -1) {
+        type = "choice";
+      } else if (val.indexOf("sc_password") > -1) {
+        type = "password";
+      }
 
-            result.push({
-                id: shortid.generate(),
-                type,
-                name: val.match(/name="(.*?)"/)[1],
-                value: val.match(val.indexOf('sc_password') > -1 ? /length="(.*?)"/ : /value="(.*?)"/)[1]
-            });
-        });
+      result.push({
+        id: shortid.generate(),
+        type,
+        name: val.match(/name="(.*?)"/)[1],
+        value: val.match(
+          val.indexOf("sc_password") > -1 ? /length="(.*?)"/ : /value="(.*?)"/
+        )[1],
+      });
+    });
 
-        return result;
-    },
+    return result;
+  },
 
-    replacedCommand: (text, paramsAsObj) => {
-        const params = [];
-        const matchedItems = text.match(new RegExp(`\\[s\\s*(.*?)\\s*\\/]`, 'g'));
-        _.forOwn(paramsAsObj, o => params.push(o));
+  replacedCommand: (text, paramsAsObj) => {
+    const params = [];
+    const matchedItems = text.match(new RegExp(`\\[s\\s*(.*?)\\s*\\/]`, "g"));
+    _.forOwn(paramsAsObj, (o) => params.push(o));
 
-        _.forEach(matchedItems, (val, index) => {
-            text = text.replace(val, params[index]);
-        });
+    _.forEach(matchedItems, (val, index) => {
+      text = text.replace(val, params[index]);
+    });
 
-        return text;
-    },
+    return text;
+  },
 
-    commandAsHtml: text => {
-        const matchedItems = text.match(new RegExp(`\\[s\\s*(.*?)\\s*\\/]`, 'g'));
+  commandAsHtml: (text) => {
+    const matchedItems = text.match(new RegExp(`\\[s\\s*(.*?)\\s*\\/]`, "g"));
 
-        _.forEach(matchedItems, (val) => {
-            text = text.replace(val, `<span>&#60;${val.match(/name="(.*?)"/)[1]}&#62;</span>`)
-        });
+    _.forEach(matchedItems, (val) => {
+      text = text.replace(
+        val,
+        `<span>&#60;${val.match(/name="(.*?)"/)[1]}&#62;</span>`
+      );
+    });
 
-        return text
-    },
+    return text;
+  },
 
-    getCommands: (selectedMenu, query) => {
-        let result = [];
-        if (selectedMenu) {
-            const slug = selectedMenu.slug;
+  getCommands: (selectedMenu, query) => {
+    let result = [];
+    if (selectedMenu) {
+      const slug = selectedMenu.slug;
 
-            if (selectedMenu.type === 'menu') {
-                if (slug === 'all_commands') {
-                    result = new Api().getAllCommands();
-                } else if (slug === 'favourites') {
-                    result = new Api().getAllFavouriteCommands();
-                } else if (slug === 'untagged') {
-                    result = new Api().getAllUntaggedCommands();
-                } else if (slug === 'trash') {
-                    result = new Api().getAllCommandsInTrash();
-                }
-            } else if (selectedMenu.type === 'search') {
-                result = new Api().queryCommand(query.toLowerCase());
-            } else {
-                result = new Api().getCommandsContainsTag(slug);
-            }
+      if (selectedMenu.type === "menu") {
+        if (slug === "all_commands") {
+          result = new Api().getAllCommands();
+        } else if (slug === "favourites") {
+          result = new Api().getAllFavouriteCommands();
+        } else if (slug === "untagged") {
+          result = new Api().getAllUntaggedCommands();
+        } else if (slug === "trash") {
+          result = new Api().getAllCommandsInTrash();
         }
-
-        return result;
+      } else if (selectedMenu.type === "search") {
+        result = new Api().queryCommand(query);
+      } else {
+        result = new Api().getCommandsContainsTag(slug);
+      }
     }
-}
+
+    return result;
+  },
+};
 
 const TagHelpers = {
-    getAllItems: () => {
-        let tagsAsStr = "";
+  getAllItems: () => {
+    let tagsAsStr = "";
 
-        _.forEach(new Api().getAllTags(), key => {
-            if (key !== null && key !== "" && key !== undefined) tagsAsStr += `${key},`;
-        });
+    _.forEach(new Api().getAllTags(), (key) => {
+      if (key !== null && key !== "" && key !== undefined)
+        tagsAsStr += `${key},`;
+    });
 
-        if (tagsAsStr === "") return [];
+    if (tagsAsStr === "") return [];
 
-        tagsAsStr = tagsAsStr.substring(0, tagsAsStr.length - 1);
-        return _.sortBy(_.uniq(tagsAsStr.split(',')));
-    }
-}
+    tagsAsStr = tagsAsStr.substring(0, tagsAsStr.length - 1);
+    return _.sortBy(_.uniq(tagsAsStr.split(",")));
+  },
+};
 
 const ReduxHelpers = {
-    fillTags: dispatch => dispatch({
-        type: SET_TAGS,
-        payload: TagHelpers.getAllItems()
+  fillTags: (dispatch) =>
+    dispatch({
+      type: SET_TAGS,
+      payload: TagHelpers.getAllItems(),
     }),
 
-    fillCommands: (dispatch, selectedMenu, query) => dispatch({
-        type: SET_COMMAND_LIST,
-        payload: CommandHelpers.getCommands(selectedMenu, query)
+  fillCommands: (dispatch, selectedMenu, query) =>
+    dispatch({
+      type: SET_COMMAND_LIST,
+      payload: CommandHelpers.getCommands(selectedMenu, query),
     }),
 
-    setSelectedMenu: (dispatch, selectedMenu) => dispatch({
-        type: SET_SELECTED_MENU_ITEM,
-        payload: selectedMenu
-    })
-}
+  setSelectedMenu: (dispatch, selectedMenu) =>
+    dispatch({
+      type: SET_SELECTED_MENU_ITEM,
+      payload: selectedMenu,
+    }),
+};
 
 const NotyHelpers = {
-    open: (text, type, timeout) => {
-        new Noty({
-            text,
-            theme: 'sunset',
-            layout: 'bottomRight',
-            type,
-            progressBar: false,
-            timeout
-        }).show();
-    },
-    closeAll: () => {
-        new Noty().close();
-    }
-}
+  open: (text, type, timeout) => {
+    new Noty({
+      text,
+      theme: "sunset",
+      layout: "bottomRight",
+      type,
+      progressBar: false,
+      timeout,
+    }).show();
+  },
+  closeAll: () => {
+    new Noty().close();
+  },
+};
 
 const StorageHelpers = {
-    preference: storagePrefences,
+  preference: storagePrefences,
 
-    initDb: () => {
-        const appDir = storagePrefences.get('storagePath').toString();
-        const backupsDir = storagePrefences.get('backupPath').toString();
+  initDb: () => {
+    const appDir = storagePrefences.get("storagePath").toString();
+    const backupsDir = storagePrefences.get("backupPath").toString();
 
-        if (!fs.existsSync(appDir)) {
-            fs.mkdirSync(appDir, { recursive: true });
-            fs.appendFileSync(path.join(appDir, App.dbName), "");
-        }
-
-        if (!fs.existsSync(backupsDir)) {
-            fs.mkdirSync(backupsDir, { recursive: true });
-        }
-    },
-
-    moveDb: (willMoveDir) => {
-        const dbFileExistPath = path.join(storagePrefences.get('storagePath').toString(), App.dbName);
-        const dbFileNewPath = path.join(willMoveDir, App.dbName);
-
-        if (!fs.existsSync(willMoveDir)) {
-            fs.mkdirSync(willMoveDir);
-        }
-
-        fs.renameSync(dbFileExistPath, dbFileNewPath);
-        storagePrefences.set('storagePath', willMoveDir);
-    },
-
-    restoreDb: (willRestoreFilePath) => {
-        const appDir = storagePrefences.get('storagePath').toString();
-
-        if (!fs.existsSync(appDir)) {
-            fs.mkdirSync(appDir);
-        }
-
-        fs.copyFileSync(willRestoreFilePath, path.join(appDir, App.dbName));
-    },
-
-    autoBackup: () => {
-        const backupFiles = StorageHelpers.getBackupFiles();
-
-        if (backupFiles.length === 0) {
-            StorageHelpers.backupNow();
-        } else {
-            const lastBackupDate = moment(backupFiles[0].date).add(6, 'hours');
-            const now = moment();
-
-            if (now.isAfter(lastBackupDate)) {
-                StorageHelpers.backupNow();
-            }
-        }
-    },
-
-    backupNow: () => {
-        const dbFilePath = path.join(storagePrefences.get('storagePath').toString(), App.dbName);
-        const dbBackupDir = path.join(storagePrefences.get('backupPath').toString(), moment().format('YYYY-MM-DD_HH-mm-ss'));
-
-        if (!fs.existsSync(dbBackupDir)) {
-            fs.mkdirSync(dbBackupDir);
-        }
-
-        fs.copyFileSync(dbFilePath, path.join(dbBackupDir, App.dbName));
-    },
-
-    /**
-     * Get backup file list
-     * 
-     * @returns array
-     */
-    getBackupFiles: () => {
-        const result = [],
-            backupDir = storagePrefences.get('backupPath').toString(),
-            folders = fs.readdirSync(backupDir);
-
-        folders.forEach((folder) => {
-            if (folder !== 'snipcommand.db') {
-                const momentVal = moment(folder, 'YYYY-MM-DD_HH-mm-ss');
-    
-                if (momentVal.isValid()){
-                    result.push({
-                        name: momentVal.format('DD MMM YYYY, HH:mm:ss'),
-                        timeAgo: momentVal.fromNow(),
-                        filePath: path.join(backupDir, folder, App.dbName),
-                        date: momentVal.format('YYYY-MM-DD HH:mm:ss')
-                    });
-                } else {
-                    console.warn(`Backup folder date is invalid: '${folder}'`);
-                }
-            }
-        });
-
-        return result.reverse();
+    if (!fs.existsSync(appDir)) {
+      fs.mkdirSync(appDir, { recursive: true });
+      fs.appendFileSync(path.join(appDir, App.dbName), "");
     }
-}
+
+    if (!fs.existsSync(backupsDir)) {
+      fs.mkdirSync(backupsDir, { recursive: true });
+    }
+  },
+
+  moveDb: (willMoveDir) => {
+    const dbFileExistPath = path.join(
+      storagePrefences.get("storagePath").toString(),
+      App.dbName
+    );
+    const dbFileNewPath = path.join(willMoveDir, App.dbName);
+
+    if (!fs.existsSync(willMoveDir)) {
+      fs.mkdirSync(willMoveDir);
+    }
+
+    fs.renameSync(dbFileExistPath, dbFileNewPath);
+    storagePrefences.set("storagePath", willMoveDir);
+  },
+
+  restoreDb: (willRestoreFilePath) => {
+    const appDir = storagePrefences.get("storagePath").toString();
+
+    if (!fs.existsSync(appDir)) {
+      fs.mkdirSync(appDir);
+    }
+
+    fs.copyFileSync(willRestoreFilePath, path.join(appDir, App.dbName));
+  },
+
+  autoBackup: () => {
+    const backupFiles = StorageHelpers.getBackupFiles();
+
+    if (backupFiles.length === 0) {
+      StorageHelpers.backupNow();
+    } else {
+      const lastBackupDate = moment(backupFiles[0].date).add(6, "hours");
+      const now = moment();
+
+      if (now.isAfter(lastBackupDate)) {
+        StorageHelpers.backupNow();
+      }
+    }
+  },
+
+  backupNow: () => {
+    const dbFilePath = path.join(
+      storagePrefences.get("storagePath").toString(),
+      App.dbName
+    );
+    const dbBackupDir = path.join(
+      storagePrefences.get("backupPath").toString(),
+      moment().format("YYYY-MM-DD_HH-mm-ss")
+    );
+
+    if (!fs.existsSync(dbBackupDir)) {
+      fs.mkdirSync(dbBackupDir);
+    }
+
+    fs.copyFileSync(dbFilePath, path.join(dbBackupDir, App.dbName));
+  },
+
+  /**
+   * Get backup file list
+   *
+   * @returns array
+   */
+  getBackupFiles: () => {
+    const result = [],
+      backupDir = storagePrefences.get("backupPath").toString(),
+      folders = fs.readdirSync(backupDir);
+
+    folders.forEach((folder) => {
+      if (folder !== "snipcommand.db") {
+        const momentVal = moment(folder, "YYYY-MM-DD_HH-mm-ss");
+
+        if (momentVal.isValid()) {
+          result.push({
+            name: momentVal.format("DD MMM YYYY, HH:mm:ss"),
+            timeAgo: momentVal.fromNow(),
+            filePath: path.join(backupDir, folder, App.dbName),
+            date: momentVal.format("YYYY-MM-DD HH:mm:ss"),
+          });
+        } else {
+          console.warn(`Backup folder date is invalid: '${folder}'`);
+        }
+      }
+    });
+
+    return result.reverse();
+  },
+};
 
 const ThemeHelpers = {
-    /**
-     * Get OS theme
-     * 
-     * @returns 'dark'|'light'
-     */
-    getSystemTheme: () => {
-        return remote.nativeTheme.shouldUseDarkColors ? 'dark' : 'light'
-    },
+  /**
+   * Get OS theme
+   *
+   * @returns 'dark'|'light'
+   */
+  getSystemTheme: () => {
+    return remote.nativeTheme.shouldUseDarkColors ? "dark" : "light";
+  },
 
-    /**
-     * Get current app theme
-     * 
-     * @returns 'dark'|'light'
-     */
-    getCurrentAppTheme: () => {
-        const appTheme = StorageHelpers.preference.get('appTheme');
+  /**
+   * Get current app theme
+   *
+   * @returns 'dark'|'light'
+   */
+  getCurrentAppTheme: () => {
+    const appTheme = StorageHelpers.preference.get("appTheme");
 
-        return appTheme === 'system' ? (remote.nativeTheme.shouldUseDarkColors ? 'dark' : 'light') : appTheme;
-    }
-}
+    return appTheme === "system"
+      ? remote.nativeTheme.shouldUseDarkColors
+        ? "dark"
+        : "light"
+      : appTheme;
+  },
+};
 
-export {CommandHelpers, TagHelpers, ReduxHelpers, NotyHelpers, StorageHelpers, ThemeHelpers};
+export {
+  CommandHelpers,
+  TagHelpers,
+  ReduxHelpers,
+  NotyHelpers,
+  StorageHelpers,
+  ThemeHelpers,
+};
