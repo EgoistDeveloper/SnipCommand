@@ -8,9 +8,12 @@
         opacity: 1;
         visibility: visible;
 
-
         .loading-screen-content {
             display: none !important;
+        }
+
+        .logo-container {
+            display: flex !important;
         }
     }
 
@@ -18,7 +21,7 @@
         position: absolute;
         top: 50%;
         left: 50%;
-        display: flex;
+        display: none;
         flex-direction: column;
         align-items: center;
         transform: translate(-50%, -50%);
